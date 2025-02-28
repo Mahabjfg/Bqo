@@ -50,7 +50,7 @@ module.exports = {
 
     } catch (error) {
       console.error("Error fetching video links:", error);
-      return message.reply("Failed to load video links. Please try again later.");
+      return message.reply("Failed to load video . Please try again later.");
     }
   }
 };
