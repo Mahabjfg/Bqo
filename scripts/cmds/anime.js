@@ -1,5 +1,3 @@
-//https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/refs/heads/main/anime.json";
-
 const axios = require("axios");
 
 module.exports = {
@@ -25,23 +23,28 @@ module.exports = {
     });
 
     // JSON ফাইলের URL
-    const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/refs/heads/main/anime.json";
+    const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/anime.json";
 
     try {
       // JSON ফাইল থেকে ডাটা নিয়ে আসা
       const response = await axios.get(jsonUrl);
-      const videoLinks = response.data.videos;
+      const data = response.data;
 
-      if (!videoLinks || videoLinks.length === 0) {
+      if (!data.videos || data.videos.length === 0) {
         return message.reply("No videos available.");
       }
 
       // এলোমেলো একটি ভিডিও লিংক নির্বাচন
-      const randomVideo = videoLinks[Math.floor(Math.random() * videoLinks.length)];
+      const randomVideo = data.videos[Math.floor(Math.random() * data.videos.length)];
+
+      // এলোমেলো একটি মেসেজ নির্বাচন (যদি থাকে)
+      const randomMessage = data.messages && data.messages.length > 0
+        ? data.messages[Math.floor(Math.random() * data.messages.length)]
+        : "❰ ANIME VIDEO ❱"; // ডিফল্ট মেসেজ
 
       // ভিডিও পাঠানো
       message.reply({
-        body: "❰ ANIME VIDEO ❱",
+        body: randomMessage, // JSON থেকে নেওয়া মেসেজ
         attachment: await global.utils.getStreamFromURL(randomVideo),
       });
 
