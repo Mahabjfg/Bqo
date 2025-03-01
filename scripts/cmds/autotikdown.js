@@ -8,7 +8,7 @@ module.exports = {
 
 	config: {
 		name: 'autotik',
-		version: '1.4',
+		version: '1.5',
 		author: 'Kshitiz', //fixed by cliff
 		countDown: 5,
 		role: 0,
@@ -52,19 +52,34 @@ module.exports = {
 	},
 	downLoad: function (url, api, event) {
 		const time = Date.now();
-		const fileExtension = url.includes('mp4') ? 'mp4' : url.includes('jpg') || url.includes('png') ? 'jpg' : 'mp4'; // Default to 'mp4' for most cases
-		const filePath = path.join(__dirname, `/cache/${time}.${fileExtension}`);
+		const filePath = path.join(__dirname, `/cache/${time}.file`);
 
 		console.log(`Fetching media from URL: ${url}`);
 
+		// Make a GET request to the media URL to fetch the file
 		axios({
 			method: "GET",
 			url: url,
 			responseType: "arraybuffer"
 		}).then(res => {
-			fs.writeFileSync(filePath, Buffer.from(res.data, "utf-8"));
-			const fileSize = fs.statSync(filePath).size / 1024 / 1024; // Convert size to MB
+			// Check if the file type is video or image from content type
+			const contentType = res.headers['content-type'];
 
+			// Check for video or image file types
+			let fileExtension = 'mp4'; // Default to mp4 for video
+			if (contentType.includes('video')) {
+				fileExtension = 'mp4'; // For video, save as .mp4
+			} else if (contentType.includes('image')) {
+				fileExtension = 'jpg'; // For image, save as .jpg
+			}
+
+			// Write the file to cache
+			const file = path.join(__dirname, `/cache/${time}.${fileExtension}`);
+			fs.writeFileSync(file, Buffer.from(res.data, "utf-8"));
+
+			const fileSize = fs.statSync(file).size / 1024 / 1024; // Convert size to MB
+
+			// Check if file size is over 25MB and notify user if so
 			if (fileSize > 25) {
 				console.log("File size is too large, deleting file.");
 				// Send a download link or notification for large files
@@ -72,11 +87,12 @@ module.exports = {
 				return api.sendMessage(`The file is too large to be sent directly. You can download it from the following link: ${downloadLink}`, event.threadID, event.messageID);
 			}
 
+			// If the file is small enough, send it as an attachment
 			console.log("File downloaded successfully, sending...");
 			api.sendMessage({
 				body: "Successful Download!",
-				attachment: fs.createReadStream(filePath)
-			}, event.threadID, () => fs.unlinkSync(filePath), event.messageID);
+				attachment: fs.createReadStream(file)
+			}, event.threadID, () => fs.unlinkSync(file), event.messageID);
 		}).catch(err => {
 			console.error("Download failed:", err);
 			api.sendMessage("An error occurred while downloading the media.", event.threadID, event.messageID);
