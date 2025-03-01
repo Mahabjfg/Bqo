@@ -8,11 +8,11 @@ module.exports = {
 
 	config: {
 		name: 'autotik',
-		version: '1.2',
+		version: '1.4',
 		author: 'Kshitiz', //fixed by cliff
 		countDown: 5,
 		role: 0,
-		shortDescription: 'auto media downloader for TikTok, Facebook, Instagram, YouTube, Pinterest',
+		shortDescription: 'Auto downloader for any media from URLs',
 		longDescription: '',
 		category: 'media',
 		guide: {
@@ -45,15 +45,15 @@ module.exports = {
 		const threadID = event.threadID;
 
 		if (this.threadStates[threadID] && this.threadStates[threadID].autoTikEnabled && this.checkLink(event.body)) {
-			const { url, mediaType } = this.checkLink(event.body);
-			this.downLoad(url, api, event, mediaType);
+			const { url } = this.checkLink(event.body);
+			this.downLoad(url, api, event);
 			api.setMessageReaction("©️", event.messageID, (err) => {}, true);
 		}
 	},
-	downLoad: function (url, api, event, mediaType) {
+	downLoad: function (url, api, event) {
 		const time = Date.now();
-		const ext = mediaType === 'video' ? 'mp4' : 'jpg'; // Determine file extension based on media type
-		const filePath = path.join(__dirname, `/cache/${time}.${ext}`);
+		const fileExtension = url.includes('mp4') ? 'mp4' : url.includes('jpg') || url.includes('png') ? 'jpg' : 'mp4'; // Default to 'mp4' for most cases
+		const filePath = path.join(__dirname, `/cache/${time}.${fileExtension}`);
 
 		console.log(`Fetching media from URL: ${url}`);
 
@@ -67,7 +67,9 @@ module.exports = {
 
 			if (fileSize > 25) {
 				console.log("File size is too large, deleting file.");
-				return api.sendMessage("The file is too large, cannot be sent", event.threadID, () => fs.unlinkSync(filePath), event.messageID);
+				// Send a download link or notification for large files
+				const downloadLink = "https://example.com/large-file"; // Replace with your actual hosting method
+				return api.sendMessage(`The file is too large to be sent directly. You can download it from the following link: ${downloadLink}`, event.threadID, event.messageID);
 			}
 
 			console.log("File downloaded successfully, sending...");
@@ -80,73 +82,10 @@ module.exports = {
 			api.sendMessage("An error occurred while downloading the media.", event.threadID, event.messageID);
 		});
 	},
-	getLink: function (url) {
-		// Handle TikTok URL
-		if (url.includes("tiktok") && url.includes("video")) {
-			return this.getTikTokVideo(url);
-		}
-		// Handle Facebook URL
-		else if (url.includes("facebook") && url.includes("video")) {
-			return this.getFacebookVideo(url);
-		}
-		// Handle Instagram URL
-		else if (url.includes("instagram") && url.includes("p")) {
-			return this.getInstagramImage(url);
-		}
-		// Handle YouTube URL
-		else if (url.includes("youtube") || url.includes("youtu.be")) {
-			return this.getYouTubeVideo(url);
-		}
-		// Handle Pinterest URL
-		else if (url.includes("pinterest")) {
-			return this.getPinterestImage(url);
-		}
-		// If URL doesn't match any of the supported formats
-		else {
-			return null;
-		}
-	},
-	getTikTokVideo: function (url) {
-		return new Promise((resolve, reject) => {
-			axios({
-				method: "GET",
-				url: `https://nayan-video-downloader.vercel.app/alldown?=${url}`
-			}).then(res => {
-				if (res.data && res.data.data && res.data.data.play) {
-					resolve({ url: res.data.data.play, mediaType: 'video' });
-				} else {
-					reject("Invalid response format.");
-				}
-			}).catch(err => {
-				console.error("Error while fetching TikTok video URL:", err);
-				reject(err);
-			});
-		});
-	},
-	getFacebookVideo: function (url) {
-		// Placeholder for Facebook video downloader logic
-		// You could use third-party services or scraping techniques for Facebook video downloading
-		return { url: url, mediaType: 'video' }; // Example, you would need to replace this with a valid API or service
-	},
-	getInstagramImage: function (url) {
-		// Placeholder for Instagram image downloader logic
-		// Similar to TikTok, you might need a scraping tool or API for Instagram images
-		return { url: url, mediaType: 'image' }; // Example, replace with actual logic
-	},
-	getYouTubeVideo: function (url) {
-		// Placeholder for YouTube video downloader logic
-		// Use a YouTube download service like youtube-dl or an API to get the video download URL
-		return { url: url, mediaType: 'video' }; // Example, replace with actual logic
-	},
-	getPinterestImage: function (url) {
-		// Placeholder for Pinterest image downloader logic
-		// Pinterest images could be downloaded using an API or scraping
-		return { url: url, mediaType: 'image' }; // Example, replace with actual logic
-	},
 	checkLink: function (url) {
-		const result = this.getLink(url);
-		if (result) {
-			return result;
+		// Check if the URL starts with 'https://'
+		if (url.startsWith("https://")) {
+			return { url: url };
 		}
 		console.log("Invalid media link.");
 		return null;
