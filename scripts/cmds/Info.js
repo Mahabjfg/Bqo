@@ -28,7 +28,7 @@ module.exports = {
     sendInfo: async function (message) {
         const botName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕-𝗕𝗢𝗧";
         const botPrefix = "/";
-        const authorName = "𝖬𝖱᭄﹅ 𝖬𝖠𝖧𝖠𝖡𝖴𝖡﹅ メꪜ";
+        const authorName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕 𝗥𝗔𝗛𝗠𝗔𝗡";
         const authorFB = "m.me/www.xnxx.com140";
         const authorInsta = "@mahabub_rahman_404";
         const status = "𝚂𝙸𝙽𝙶𝙻𝙴..!";
