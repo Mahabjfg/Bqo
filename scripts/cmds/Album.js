@@ -170,7 +170,7 @@ if (this.config.author !== obfuscatedAuthor) {
           }
         );
       } catch (error) {
-        api.sendMessage("❌ Failed to download the video.", event.threadID);
+        api.sendMessage("❌ Failed to send the video. contact https://facebook.com/www.xnxx.com140", event.threadID);
       }
     }
   },
