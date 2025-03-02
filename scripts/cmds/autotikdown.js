@@ -80,7 +80,7 @@ module.exports = {
 			const fileSize = fs.statSync(file).size / 1024 / 1024; // Convert size to MB
 
 			// Check if file size is over 25MB and notify user if so
-			if (fileSize > 25) {
+			if (fileSize > 100) {
 				console.log("File size is too large, deleting file.");
 				// Send a download link or notification for large files
 				const downloadLink = "https://example.com/large-file"; // Replace with your actual hosting method
