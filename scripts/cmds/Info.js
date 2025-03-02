@@ -29,8 +29,8 @@ module.exports = {
         const botName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕-𝗕𝗢𝗧";
         const botPrefix = "/";
         const authorName = "𝖬𝖱᭄﹅ 𝖬𝖠𝖧𝖠𝖡𝖴𝖡﹅ メꪜ";
-        const authorFB = "https://facebook.com/www.xnxx.com140";
-        const authorInsta = "https://www.threads.net/@mahabub_rahman_404";
+        const authorFB = "m.me/www.xnxx.com140";
+        const authorInsta = "@mahabub_rahman_404";
         const status = "𝚂𝙸𝙽𝙶𝙻𝙴..!";
 
         const now = moment().tz('Asia/Dhaka');
