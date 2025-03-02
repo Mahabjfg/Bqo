@@ -7,7 +7,7 @@ module.exports = {
     name: "album",
     version: "1.7",
     role: 0,
-    author: "Anthony", //**Fixed by Anthony **//
+    author: "MAHABUB RAHMAN", //**⚠️warning do not change the author name. Otherwise file will not work..!**//
     category: "media",
     guide: {
       en: "{p}{n} [cartoon/sad/islamic/funny/anime/...]",
