@@ -3,8 +3,8 @@ const fs = require("fs-extra");
 const request = require("request");
 module.exports = {
 config: {
-name: "Out",
-aliases: ["l"],
+name: "out",
+aliases: ["leave"],
 version: "1.0",
 author: "Sandy",
 countDown: 5,
@@ -25,6 +25,6 @@ id = event.threadID;
 } else {
 id = parseInt(args.join(" "));
 }
-return api.sendMessage('I'VE TO LEAVE NOW.BYE BYE 😞🫶', id, () => api.removeUserFromGroup(api.getCurrentUserID(), id))
+return api.sendMessage('I HAVE TO LEAVE NOW.BYE BYE 😞🫶', id, () => api.removeUserFromGroup(api.getCurrentUserID(), id))
 }
 }
