@@ -15,11 +15,11 @@ module.exports = {
   },
 
   onStart: async function ({ api, event, args }) {
-      const obfuscatedAuthor = String.fromCharCode(77, 65, 72, 65, 66, 85, 66, 82, 65, 72, 77, 65, 78); 
-         if (this.config.author !== obfuscatedAuthor) {
-        return api.sendMessage("You are not authorized to change the author name.\n\nPlease fix author name to work with this cmd", event.threadID, event.messageID);
-         }
-      if (!args[0]) {
+    const obfuscatedAuthor = String.fromCharCode(77, 65, 72, 65, 66, 85, 66, 82, 65, 72, 77, 65, 78);
+    if (this.config.author !== obfuscatedAuthor) {
+      return api.sendMessage("You are not authorized to change the author name.\n\nPlease fix author name to work with this cmd", event.threadID, event.messageID);
+    }
+    if (!args[0]) {
       api.setMessageReaction("😽", event.messageID, (err) => {}, true);
 
       const albumOptions = [
@@ -43,8 +43,8 @@ module.exports = {
         "𝐅𝐫𝐢𝐞𝐧𝐝𝐬 𝐕𝐢𝐝𝐞𝐨 📔",
       ];
 
-      const message =
-        "𝐇𝐞𝐫𝐞 𝐢𝐬 𝐲𝐨𝐮𝐫 𝐚𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐚𝐥𝐛𝐮𝐦 𝐯𝐢𝐝𝐞𝐨 𝐥𝐢𝐬𝐭 📔<\n" +
+      const message = 
+        "𝐇𝐞𝐫𝐞 𝐢𝐬 𝐲𝐨𝐮𝐫 𝐚𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐚𝐥𝐛𝐮𝐦 𝐯𝐢𝐝𝐞𝐨 𝐥𝐢𝐬𝐭 📔\n" +
         "━━━━━━━━━━━━━━━━━━━━━\n" +
         albumOptions.map((option, index) => `${index + 1}. ${option}`).join("\n") +
         "\n━━━━━━━━━━━━━━━━━━━━━";
@@ -128,32 +128,33 @@ module.exports = {
         return api.sendMessage("❌ You don't have permission to access this category.", event.threadID);
       }
 
-      const albumData = JSON.parse(fs.readFileSync("Mahabub.json", "utf-8"));
-      const videoUrls = albumData[query];
-
-      if (!videoUrls || videoUrls.length === 0) {
-        return api.sendMessage("❌ No videos found for this category.", event.threadID, event.messageID);
-      }
-
-      const randomVideoUrl = videoUrls[Math.floor(Math.random() * videoUrls.length)];
-      const filePath = path.join(__dirname, "temp_video.mp4");
-
-      async function downloadFile(url, filePath) {
-        const response = await axios({
-          url,
-          method: "GET",
-          responseType: "stream",
-        });
-
-        return new Promise((resolve, reject) => {
-          const writer = fs.createWriteStream(filePath);
-          response.data.pipe(writer);
-          writer.on("finish", resolve);
-          writer.on("error", reject);
-        });
-      }
-
       try {
+        const response = await axios.get("https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/Commands/Album/Mahabub.json");
+        const albumData = response.data;
+        const videoUrls = albumData[query];
+
+        if (!videoUrls || videoUrls.length === 0) {
+          return api.sendMessage("❌ No videos found for this category.", event.threadID, event.messageID);
+        }
+
+        const randomVideoUrl = videoUrls[Math.floor(Math.random() * videoUrls.length)];
+        const filePath = path.join(__dirname, "temp_video.mp4");
+
+        async function downloadFile(url, filePath) {
+          const response = await axios({
+            url,
+            method: "GET",
+            responseType: "stream",
+          });
+
+          return new Promise((resolve, reject) => {
+            const writer = fs.createWriteStream(filePath);
+            response.data.pipe(writer);
+            writer.on("finish", resolve);
+            writer.on("error", reject);
+          });
+        }
+
         await downloadFile(randomVideoUrl, filePath);
 
         api.sendMessage(
