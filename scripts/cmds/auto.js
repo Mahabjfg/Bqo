@@ -26,7 +26,7 @@ let autoLinkStates = loadAutoLinkStates();
 module.exports = {
   threadStates: {},
   config: {
-    name: 'autolink',
+    name: 'autolink2',
     version: '3.0',
     author: 'Vex_Kshitiz',
     countDown: 5,
