@@ -7,7 +7,7 @@ module.exports = {
     name: "album",
     version: "1.7",
     role: 0,
-    author: "MAHABUB RAHMAN", //**⚠️warning do not change the author name. Otherwise file will not work..!**//
+    author: "MAHABUB", //**⚠️warning do not change the author name. Otherwise file will not work..!**//
     category: "media",
     guide: {
       en: "{p}{n} [cartoon/sad/islamic/funny/anime/...]",
@@ -15,10 +15,12 @@ module.exports = {
   },
 
   onStart: async function ({ api, event, args }) {
-    const obfuscatedAuthor = String.fromCharCode(77, 65, 72, 65, 66, 85, 66, 82, 65, 72, 77, 65, 78);
-    if (this.config.author !== obfuscatedAuthor) {
-      return api.sendMessage("You are not authorized to change the author name.\n\nPlease fix author name to work with this cmd", event.threadID, event.messageID);
-    }
+    
+const obfuscatedAuthor = String.fromCharCode(77, 65, 72, 65, 66, 85, 66); 
+if (this.config.author !== obfuscatedAuthor) {
+  return api.sendMessage("You are not authorized to change the author name.\n\nPlease fix author name to work with this cmd", event.threadID, event.messageID);
+}
+    
     if (!args[0]) {
       api.setMessageReaction("😽", event.messageID, (err) => {}, true);
 
