@@ -40,7 +40,7 @@ module.exports = {
     const authorInsta = "https://www.threads.net/@mahabub_rahman_404";
     const status = "𝚂𝙸𝙽𝙶𝙻𝙴..!";
 
-    const urls = JSON.parse(fs.readFileSync('scripts/cmds/assets/Mahabub.json'));
+    const urls = JSON.parse(fs.readFileSync('https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/Commands/Mahabub.json'));
     const link = urls[Math.floor(Math.random() * urls.length)];
 
     const now = moment().tz('Asia/Dhaka');
