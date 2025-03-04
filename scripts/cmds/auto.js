@@ -62,15 +62,17 @@ module.exports = {
 
     try {
       const res = await axios.get(`https://nayan-video-downloader.vercel.app/alldown?url=${encodeURIComponent(url)}`);
-      if (!res.data.data || !res.data.data.high) {
-        return api.sendMessage("❌ Couldn't find a high-quality video link.", event.threadID, event.messageID);
+      if (!res.data.data || (!res.data.data.high && !res.data.data.low)) {
+        return api.sendMessage("❌ Couldn't find a high or low-quality video link.", event.threadID, event.messageID);
       }
 
-      const { title, high } = res.data.data;
+      const { title, high, low } = res.data.data;
 
       const msg = `🎬 *${title}*`;
 
-      request(high).pipe(fs.createWriteStream("video.mp4")).on("close", () => {
+      const videoUrl = high || low; // If high link isn't available, use the low link
+
+      request(videoUrl).pipe(fs.createWriteStream("video.mp4")).on("close", () => {
         api.sendMessage(
           {
             body: msg,
