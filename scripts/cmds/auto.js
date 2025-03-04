@@ -29,22 +29,8 @@ module.exports = {
   },
 
   onStart: async function ({ api, event }) {
-    const threadID = event.threadID;
-
-    if (!autoLinkStates[threadID]) {
-      autoLinkStates[threadID] = 'on';
-      saveAutoLinkStates(autoLinkStates);
-    }
-
-    if (event.body.toLowerCase().includes('autolink off')) {
-      autoLinkStates[threadID] = 'off';
-      saveAutoLinkStates(autoLinkStates);
-      api.sendMessage("✅ AutoLink is now turned OFF.", event.threadID, event.messageID);
-    } else if (event.body.toLowerCase().includes('autolink on')) {
-      autoLinkStates[threadID] = 'on';
-      saveAutoLinkStates(autoLinkStates);
-      api.sendMessage("✅ AutoLink is now turned ON.", event.threadID, event.messageID);
-    }
+    // এই অংশটি সম্পূর্ণভাবে মুছে ফেলা হয়েছে
+    // autoLinkStates[threadID] এবং /autolink on, /autolink off কমান্ড চেকিং বাদ দেয়া হয়েছে
   },
 
   onChat: async function ({ api, event }) {
@@ -56,8 +42,7 @@ module.exports = {
 
     const url = linkMatch[0];
 
-    if (autoLinkStates[threadID] !== 'on') return;
-
+    // স্টেট চেকিং করা হয়নি, তাই যেকোনো লিংকেই কাজ করবে
     api.setMessageReaction("⏳", event.messageID, () => {}, true);
 
     try {
