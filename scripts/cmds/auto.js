@@ -1,8 +1,6 @@
 const fs = require("fs-extra");
 const axios = require("axios");
 
-const { shortenURL } = global.utils;
-
 function loadAutoLinkStates() {
   try {
     const data = fs.readFileSync("autolink.json", "utf8");
@@ -21,19 +19,19 @@ let autoLinkStates = loadAutoLinkStates();
 module.exports = {
   config: {
     name: 'autolink',
-    version: '3.1',
-    author: 'Vex_Kshitiz',
+    version: '3.3',
+    author: 'MOHAMMAD NAYAN',
     countDown: 5,
     role: 0,
-    shortDescription: 'Auto video downloader from social media',
+    shortDescription: 'Auto-download videos from links',
     category: 'media',
   },
-  
+
   onStart: async function ({ api, event }) {
     const threadID = event.threadID;
 
     if (!autoLinkStates[threadID]) {
-      autoLinkStates[threadID] = 'on'; 
+      autoLinkStates[threadID] = 'on';
       saveAutoLinkStates(autoLinkStates);
     }
 
@@ -59,19 +57,17 @@ module.exports = {
 
     if (autoLinkStates[threadID] !== 'on') return;
 
-    api.setMessageReaction("🪄", event.messageID, () => {}, true);
+    api.setMessageReaction("⏳", event.messageID, () => {}, true);
 
     try {
       const res = await axios.get(`https://nayan-video-downloader.vercel.app/alldown?url=${encodeURIComponent(url)}`);
-      if (!res.data.url) {
-        return api.sendMessage("❌ Sorry, couldn't find a download link for this video.", event.threadID, event.messageID);
+      if (!res.data.data || !res.data.data.high) {
+        return api.sendMessage("❌ Couldn't find a high-quality video link.", event.threadID, event.messageID);
       }
 
-      const videoUrl = res.data.url;
-      const title = res.data.title || "Downloaded Video";
-      const shortUrl = await shortenURL(videoUrl);
+      const { title, high } = res.data.data;
 
-      const msg = `📌 *${title}*\n\n🔗 *Download Link:* ${shortUrl}`;
+      const msg = `🎬 *${title}*\n\n🔗 *Download (High Quality):* ${high}`;
 
       api.sendMessage(msg, event.threadID, event.messageID);
     } catch (err) {
