@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const axios = require("axios");
+const request = require("request");
 
 function loadAutoLinkStates() {
   try {
@@ -19,11 +20,11 @@ let autoLinkStates = loadAutoLinkStates();
 module.exports = {
   config: {
     name: 'autolink',
-    version: '3.3',
+    version: '3.4',
     author: 'MOHAMMAD NAYAN',
     countDown: 5,
     role: 0,
-    shortDescription: 'Auto-download videos from links',
+    shortDescription: 'Auto-download and send videos from links',
     category: 'media',
   },
 
@@ -67,9 +68,19 @@ module.exports = {
 
       const { title, high } = res.data.data;
 
-      const msg = `🎬 *${title}*\n\n🔗 *Download (High Quality):* ${high}`;
+      const msg = `🎬 *${title}*\n\n📥 Downloading & Sending Video...`;
 
-      api.sendMessage(msg, event.threadID, event.messageID);
+      api.sendMessage(msg, event.threadID, async () => {
+        const videoStream = request(high);
+        api.sendMessage(
+          {
+            attachment: videoStream
+          },
+          event.threadID,
+          event.messageID
+        );
+      });
+
     } catch (err) {
       console.error("Error fetching video:", err);
       api.sendMessage("❌ Error while fetching video. Please try again later.", event.threadID, event.messageID);
