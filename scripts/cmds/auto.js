@@ -20,11 +20,11 @@ let autoLinkStates = loadAutoLinkStates();
 module.exports = {
   config: {
     name: 'autolink',
-    version: '3.4',
+    version: '3.5',
     author: 'MOHAMMAD NAYAN',
     countDown: 5,
     role: 0,
-    shortDescription: 'Auto-download and send videos from links',
+    shortDescription: 'Auto-download and send videos with title',
     category: 'media',
   },
 
@@ -53,7 +53,7 @@ module.exports = {
 
     const linkMatch = message.match(/(https?:\/\/[^\s]+)/);
     if (!linkMatch) return;
-    
+
     const url = linkMatch[0];
 
     if (autoLinkStates[threadID] !== 'on') return;
@@ -68,16 +68,18 @@ module.exports = {
 
       const { title, high } = res.data.data;
 
-      const msg = `🎬 *${title}*\n\n📥 Downloading & Sending Video...`;
+      const msg = `🎬 *${title}*`;
 
-      api.sendMessage(msg, event.threadID, async () => {
-        const videoStream = request(high);
+      request(high).pipe(fs.createWriteStream("video.mp4")).on("close", () => {
         api.sendMessage(
           {
-            attachment: videoStream
+            body: msg,
+            attachment: fs.createReadStream("video.mp4")
           },
           event.threadID,
-          event.messageID
+          () => {
+            fs.unlinkSync("video.mp4"); // Delete after sending
+          }
         );
       });
 
