@@ -18,6 +18,7 @@ module.exports.onStart = async ({ api, event, args, usersData }) => {
   const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
   const userMessage = args.join(" ").toLowerCase();
   const senderID = event.senderID;  // Get the sender's ID
+  const senderName = (await usersData.get(senderID)).name; // Get the sender's name
 
   try {
     if (!args[0]) {
@@ -37,11 +38,7 @@ module.exports.onStart = async ({ api, event, args, usersData }) => {
 
       // Mention the sender using their user ID
       return api.sendMessage({
-        body: `@${senderID} ${reply}`, // Mention the sender
-        mentions: [{
-          tag: `@${senderID}`,  // Mention user by ID
-          id: senderID,  // Mention the sender's ID
-        }]
+        body: `@${senderName} ${reply}`, // Mention the sender by name
       }, event.threadID, event.messageID);
     }
 
@@ -50,11 +47,7 @@ module.exports.onStart = async ({ api, event, args, usersData }) => {
     const reply = response.data.message || "আমি বুঝতে পারলাম না।";
 
     api.sendMessage({
-      body: `@${senderID} ${reply}`,
-      mentions: [{
-        tag: `@${senderID}`,
-        id: senderID,
-      }]
+      body: `@${senderName} ${reply}`,
     }, event.threadID, event.messageID);
   } catch (error) {
     console.error(error);
@@ -67,15 +60,12 @@ module.exports.onReply = async ({ api, event, usersData }) => {
     if (event.type === "message_reply") {
       const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
       const senderID = event.senderID;  // Get the sender's ID
+      const senderName = (await usersData.get(senderID)).name; // Get the sender's name
       const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(event.body.toLowerCase())}`);
       const reply = response.data.message || "আমি বুঝতে পারলাম না।";
 
       api.sendMessage({
-        body: `@${senderID} ${reply}`,
-        mentions: [{
-          tag: `@${senderID}`,
-          id: senderID,
-        }]
+        body: `@${senderName} ${reply}`,
       }, event.threadID, event.messageID);
     }
   } catch (error) {
@@ -87,6 +77,7 @@ module.exports.onChat = async ({ api, event, usersData }) => {
   try {
     const body = event.body ? event.body.toLowerCase() : "";
     const senderID = event.senderID;  // Get the sender's ID
+    const senderName = (await usersData.get(senderID)).name; // Get the sender's name
     
     if (body === "bby" || body === "baby" || body === "janu") {
       const randomReplies = [
@@ -104,11 +95,7 @@ module.exports.onChat = async ({ api, event, usersData }) => {
       const reply = response.data.message || "আমি বুঝতে পারলাম না।";
       
       return api.sendMessage({
-        body: `@${senderID} ${reply}`,
-        mentions: [{
-          tag: `@${senderID}`,
-          id: senderID,
-        }]
+        body: `@${senderName} ${reply}`,
       }, event.threadID, event.messageID);
     }
 
@@ -118,11 +105,7 @@ module.exports.onChat = async ({ api, event, usersData }) => {
     const reply = response.data.message || "আমি বুঝতে পারলাম না।";
 
     api.sendMessage({
-      body: `@${senderID} ${reply}`,
-      mentions: [{
-        tag: `@${senderID}`,
-        id: senderID,
-      }]
+      body: `@${senderName} ${reply}`,
     }, event.threadID, event.messageID);
   } catch (error) {
     api.sendMessage(`Error: ${error.message}`, event.threadID, event.messageID);
