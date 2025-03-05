@@ -15,31 +15,21 @@ module.exports.config = {
 };
 
 module.exports.onStart = async ({ api, event, args }) => {
-  const link = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
-  const dipto = args.join(" ").toLowerCase();
-  const uid = event.senderID;
+  const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
+  const userMessage = args.join(" ").toLowerCase();
 
   try {
     if (!args[0]) {
-      const ran = ["Bolo baby", "hum", "type help baby", "type !baby hi"];
-      return api.sendMessage(ran[Math.floor(Math.random() * ran.length)], event.threadID, event.messageID);
+      return api.sendMessage("Say something! 😊", event.threadID, event.messageID);
     }
 
     // Request to SimSimi API
-    const response = await axios.get(`${link}?reply=${encodeURIComponent(dipto)}`);
-    const reply = response.data.response || "I couldn't understand that.";
+    const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
+    const reply = response.data.message || "I couldn't understand that.";
 
-    api.sendMessage(reply, event.threadID, (error, info) => {
-      global.GoatBot.onReply.set(info.messageID, {
-        commandName: this.config.name,
-        type: "reply",
-        messageID: info.messageID,
-        author: event.senderID,
-        reply
-      });
-    }, event.messageID);
-  } catch (e) {
-    console.log(e);
+    api.sendMessage(reply, event.threadID, event.messageID);
+  } catch (error) {
+    console.error(error);
     api.sendMessage("Error: Unable to fetch response.", event.threadID, event.messageID);
   }
 };
@@ -47,47 +37,31 @@ module.exports.onStart = async ({ api, event, args }) => {
 module.exports.onReply = async ({ api, event }) => {
   try {
     if (event.type === "message_reply") {
-      const link = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
-      const response = await axios.get(`${link}?reply=${encodeURIComponent(event.body.toLowerCase())}`);
-      const reply = response.data.response || "I couldn't understand that.";
+      const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
+      const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(event.body.toLowerCase())}`);
+      const reply = response.data.message || "I couldn't understand that.";
 
-      await api.sendMessage(reply, event.threadID, (error, info) => {
-        global.GoatBot.onReply.set(info.messageID, {
-          commandName: this.config.name,
-          type: "reply",
-          messageID: info.messageID,
-          author: event.senderID,
-          reply
-        });
-      }, event.messageID);
+      api.sendMessage(reply, event.threadID, event.messageID);
     }
-  } catch (err) {
-    return api.sendMessage(`Error: ${err.message}`, event.threadID, event.messageID);
+  } catch (error) {
+    api.sendMessage(`Error: ${error.message}`, event.threadID, event.messageID);
   }
 };
 
-module.exports.onChat = async ({ api, event, message }) => {
+module.exports.onChat = async ({ api, event }) => {
   try {
     const body = event.body ? event.body.toLowerCase() : "";
     if (body.startsWith("baby") || body.startsWith("bby") || body.startsWith("janu")) {
-      const arr = body.replace(/^\S+\s*/, "");
-      if (!arr) return message.reply("কথা দাও তুমি আমাকে পটিয়ে নিবা!🥺");
+      const userMessage = body.replace(/^\S+\s*/, "");
+      if (!userMessage) return api.sendMessage("কথা দাও তুমি আমাকে পটিয়ে নিবা!🥺", event.threadID, event.messageID);
 
-      const link = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
-      const response = await axios.get(`${link}?reply=${encodeURIComponent(arr)}`);
-      const reply = response.data.response || "I couldn't understand that.";
+      const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
+      const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
+      const reply = response.data.message || "I couldn't understand that.";
 
-      await api.sendMessage(reply, event.threadID, (error, info) => {
-        global.GoatBot.onReply.set(info.messageID, {
-          commandName: this.config.name,
-          type: "reply",
-          messageID: info.messageID,
-          author: event.senderID,
-          reply
-        });
-      }, event.messageID);
+      api.sendMessage(reply, event.threadID, event.messageID);
     }
-  } catch (err) {
-    return api.sendMessage(`Error: ${err.message}`, event.threadID, event.messageID);
+  } catch (error) {
+    api.sendMessage(`Error: ${error.message}`, event.threadID, event.messageID);
   }
 };
