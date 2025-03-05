@@ -53,7 +53,7 @@ module.exports = {
 
       const { title, high, low } = res.data.data;
 
-      const msg = `🎬 *${title}*`;
+      const msg = `《TITLE》: 🎬*${title}*`;
 
       const videoUrl = high || low; // If high link isn't available, use the low link
 
