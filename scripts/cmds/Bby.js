@@ -15,7 +15,7 @@ module.exports.config = {
 };
 
 module.exports.onStart = async ({ api, event, args }) => {
-  const apiUrl = `https://simsimi-99qa.onrender.com/sim`;
+  const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
   const userMessage = args.join(" ").toLowerCase();
 
   try {
@@ -29,7 +29,15 @@ module.exports.onStart = async ({ api, event, args }) => {
       return api.sendMessage(randomReplies[Math.floor(Math.random() * randomReplies.length)], event.threadID, event.messageID);
     }
 
-    // SimSimi API request
+    // If message starts with "bby" and is followed by something like "hi", "ki koro", "kmn aso", get response from SimSimi
+    if (userMessage.startsWith("bby")) {
+      const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage.replace("bby ", ""))}`);
+      const reply = response.data.message || "আমি বুঝতে পারলাম না।";
+
+      return api.sendMessage(reply, event.threadID, event.messageID);
+    }
+
+    // Fallback to SimSimi API for other messages
     const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
     const reply = response.data.message || "আমি বুঝতে পারলাম না।";
 
@@ -43,7 +51,7 @@ module.exports.onStart = async ({ api, event, args }) => {
 module.exports.onReply = async ({ api, event }) => {
   try {
     if (event.type === "message_reply") {
-      const apiUrl = `https://simsimi-99qa.onrender.com/sim`;
+      const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
       const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(event.body.toLowerCase())}`);
       const reply = response.data.message || "আমি বুঝতে পারলাম না।";
 
@@ -57,6 +65,7 @@ module.exports.onReply = async ({ api, event }) => {
 module.exports.onChat = async ({ api, event }) => {
   try {
     const body = event.body ? event.body.toLowerCase() : "";
+    
     if (body === "bby" || body === "baby" || body === "janu") {
       const randomReplies = [
         "হুম বলো? 😊", 
@@ -67,6 +76,15 @@ module.exports.onChat = async ({ api, event }) => {
       return api.sendMessage(randomReplies[Math.floor(Math.random() * randomReplies.length)], event.threadID, event.messageID);
     }
 
+    // If the message starts with 'bby' and has additional text, make a request to SimSimi API
+    if (body.startsWith("bby")) {
+      const response = await axios.get(`https://simsimi-99qa.onrender.com/sim?reply=${encodeURIComponent(body.replace("bby ", ""))}`);
+      const reply = response.data.message || "আমি বুঝতে পারলাম না।";
+      
+      return api.sendMessage(reply, event.threadID, event.messageID);
+    }
+
+    // Fallback to SimSimi API for other types of messages
     const apiUrl = `https://simsimi-99qa.onrender.com/sim`;
     const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(body)}`);
     const reply = response.data.message || "আমি বুঝতে পারলাম না।";
