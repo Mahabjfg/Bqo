@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports.config = {
   name: "bby",
-  aliases: ["baby", "bbe", "babe"],
+  aliases: ["baby", "bot", "bbe", "babe", "Bot"],
   version: "6.9.0",
   author: "dipto",
   countDown: 0,
@@ -20,26 +20,12 @@ module.exports.onStart = async ({ api, event, args }) => {
 
   try {
     if (!args[0]) {
-      const randomReplies = [
-        "হুম বলো? 😊", 
-        "কি বলবা আমাকে? 😏", 
-        "আমি কিন্তু তোমার জন্য ওয়েট করছিলাম! 😍", 
-        "বলো বেবি, কেমন আছো? 🥰"
-      ];
-      return api.sendMessage(randomReplies[Math.floor(Math.random() * randomReplies.length)], event.threadID, event.messageID);
+      return api.sendMessage("", event.threadID, event.messageID);
     }
 
-    // If message starts with "bby" and is followed by something like "hi", "ki koro", "kmn aso", get response from SimSimi
-    if (userMessage.startsWith("bby")) {
-      const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage.replace("bby ", ""))}`);
-      const reply = response.data.message || "আমি বুঝতে পারলাম না।";
-
-      return api.sendMessage(reply, event.threadID, event.messageID);
-    }
-
-    // Fallback to SimSimi API for other messages
+    // Request to SimSimi API
     const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
-    const reply = response.data.message || "আমি বুঝতে পারলাম না।";
+    const reply = response.data.message || "I couldn't understand that.";
 
     api.sendMessage(reply, event.threadID, event.messageID);
   } catch (error) {
@@ -53,7 +39,7 @@ module.exports.onReply = async ({ api, event }) => {
     if (event.type === "message_reply") {
       const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
       const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(event.body.toLowerCase())}`);
-      const reply = response.data.message || "আমি বুঝতে পারলাম না।";
+      const reply = response.data.message || "I couldn't understand that.";
 
       api.sendMessage(reply, event.threadID, event.messageID);
     }
@@ -65,31 +51,16 @@ module.exports.onReply = async ({ api, event }) => {
 module.exports.onChat = async ({ api, event }) => {
   try {
     const body = event.body ? event.body.toLowerCase() : "";
-    
-    if (body === "bby" || body === "baby" || body === "janu") {
-      const randomReplies = [
-        "হুম বলো? 😊", 
-        "কি বলবা আমাকে? 😏", 
-        "আমি কিন্তু তোমার জন্য ওয়েট করছিলাম! 😍", 
-        "বলো বেবি, কেমন আছো? 🥰"
-      ];
-      return api.sendMessage(randomReplies[Math.floor(Math.random() * randomReplies.length)], event.threadID, event.messageID);
+    if (body.startsWith("baby") || body.startsWith("bby") || body.startsWith("janu")) {
+      const userMessage = body.replace(/^\S+\s*/, "");
+      if (!userMessage) return api.sendMessage("কথা দাও তুমি আমাকে পটিয়ে নিবা!🥺", event.threadID, event.messageID);
+
+      const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
+      const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
+      const reply = response.data.message || "I couldn't understand that.";
+
+      api.sendMessage(reply, event.threadID, event.messageID);
     }
-
-    // If the message starts with 'bby' and has additional text, make a request to SimSimi API
-    if (body.startsWith("bby")) {
-      const response = await axios.get(`https://simsimi-99qa.onrender.com/sim?reply=${encodeURIComponent(body.replace("bby ", ""))}`);
-      const reply = response.data.message || "আমি বুঝতে পারলাম না।";
-      
-      return api.sendMessage(reply, event.threadID, event.messageID);
-    }
-
-    // Fallback to SimSimi API for other types of messages
-    const apiUrl = `https://simsimi-99qa.onrender.com/sim`;
-    const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(body)}`);
-    const reply = response.data.message || "আমি বুঝতে পারলাম না।";
-
-    api.sendMessage(reply, event.threadID, event.messageID);
   } catch (error) {
     api.sendMessage(`Error: ${error.message}`, event.threadID, event.messageID);
   }
