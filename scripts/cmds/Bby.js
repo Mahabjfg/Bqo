@@ -15,34 +15,29 @@ module.exports.config = {
 };
 
 module.exports.onStart = async ({ api, event, args, usersData }) => {
-  const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
-  const userMessage = args.join(" ").toLowerCase();
   const senderID = event.senderID;  // Get the sender's ID
   const senderName = (await usersData.get(senderID)).name; // Get the sender's name
 
   try {
-    if (!args[0]) {
+    // If the user just types "bby", give a random reply with username mention
+    if (args[0].toLowerCase() === "bby") {
       const randomReplies = [
         "হুম বলো? 😊", 
         "কি বলবা আমাকে? 😏", 
         "আমি কিন্তু তোমার জন্য ওয়েট করছিলাম! 😍", 
         "বলো বেবি, কেমন আছো? 🥰"
       ];
-      return api.sendMessage(randomReplies[Math.floor(Math.random() * randomReplies.length)], event.threadID, event.messageID);
-    }
-
-    // If message starts with "bby" and is followed by something like "hi", "ki koro", "kmn aso", get response from SimSimi
-    if (userMessage.startsWith("bby")) {
-      const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage.replace("bby ", ""))}`);
-      const reply = response.data.message || "আমি বুঝতে পারলাম না।";
-
-      // Mention the sender using their user ID
+      const reply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+      
+      // Send message with sender's username mention
       return api.sendMessage({
-        body: `@${senderName} ${reply}`, // Mention the sender by name
+        body: `@${senderName} ${reply}`, // Mention the sender's name
       }, event.threadID, event.messageID);
     }
 
-    // Fallback to SimSimi API for other messages
+    // If there are more arguments, fallback to SimSimi API
+    const userMessage = args.join(" ").toLowerCase();
+    const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
     const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
     const reply = response.data.message || "আমি বুঝতে পারলাম না।";
 
@@ -86,7 +81,10 @@ module.exports.onChat = async ({ api, event, usersData }) => {
         "আমি কিন্তু তোমার জন্য ওয়েট করছিলাম! 😍", 
         "বলো বেবি, কেমন আছো? 🥰"
       ];
-      return api.sendMessage(randomReplies[Math.floor(Math.random() * randomReplies.length)], event.threadID, event.messageID);
+      const reply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+      return api.sendMessage({
+        body: `@${senderName} ${reply}`,
+      }, event.threadID, event.messageID);
     }
 
     // If the message starts with 'bby' and has additional text, make a request to SimSimi API
