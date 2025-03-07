@@ -1,7 +1,9 @@
+const axios = require("axios");
+
 module.exports = {
   config: {
-    name: "anime2",
-    aliases: ["ani"],
+    name: "anime",
+    aliases: ["ani", "rndm", "random", "status"], // Add the new aliases here
     version: "1.0",
     author: "‎MR᭄﹅ MAHABUB﹅ メꪜ",
     countDown: 10,
@@ -9,51 +11,52 @@ module.exports = {
     shortDescription: "anime videos",
     longDescription: "anime videos from mahabub",
     category: "user",
-    guide: "anime",
+    guide: "anime",  // No prefix needed now
   },
 
   onStart: async function ({ api, event, message }) {
     const senderID = event.senderID;
 
-    // Check if the message body is exactly "fuck" (case insensitive)
-    if (event.body && event.body.toLowerCase() === "fuck") {
-      return message.reply("Please mind your language.");
-    }
-
-    // Check if the message body is exactly "Fuck"
-    if (event.body && event.body === "Fuck") {
-      return message.reply("Please mind your language.");
-    }
-
-    // JSON URL for fetching random anime videos
-    const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/anime.json";
-
-    try {
-      // Fetch JSON data
-      const response = await axios.get(jsonUrl);
-      const data = response.data;
-
-      if (!data.videos || data.videos.length === 0) {
-        return message.reply("No videos available.");
-      }
-
-      // Select a random video from the list
-      const randomVideo = data.videos[Math.floor(Math.random() * data.videos.length)];
-
-      // Select a random message from the list
-      const randomMessage = data.messages && data.messages.length > 0
-        ? data.messages[Math.floor(Math.random() * data.messages.length)]
-        : "❰ ANIME VIDEO ❱"; // Default message
-
-      // Send the video and message to the user
-      message.reply({
-        body: randomMessage,
-        attachment: await global.utils.getStreamFromURL(randomVideo),
+    // Check if the message is one of the commands we want to respond to
+    const messageText = event.body.trim().toLowerCase();
+    if (["rndm", "random", "status"].includes(messageText)) {
+      // লোডিং মেসেজ পাঠানো
+      const loadingMessage = await message.reply({
+        body: "Loading random video... Please wait! (up to 5 sec)...\n𝐍𝐨𝐰 𝐥𝐨𝐚𝐝𝐢𝐧𝐠. . .\n█▒▒▒▒▒▒▒▒▒",
       });
 
-    } catch (error) {
-      console.error("Error fetching video links:", error);
-      return message.reply("Failed to load video. Please try again later.");
+      // JSON ফাইলের URL
+      const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/anime.json";
+
+      try {
+        // JSON ফাইল থেকে ডাটা নিয়ে আসা
+        const response = await axios.get(jsonUrl);
+        const data = response.data;
+
+        if (!data.videos || data.videos.length === 0) {
+          return message.reply("No videos available.");
+        }
+
+        // এলোমেলো একটি ভিডিও লিংক নির্বাচন
+        const randomVideo = data.videos[Math.floor(Math.random() * data.videos.length)];
+
+        // এলোমেলো একটি মেসেজ নির্বাচন (যদি থাকে)
+        const randomMessage = data.messages && data.messages.length > 0
+          ? data.messages[Math.floor(Math.random() * data.messages.length)]
+          : "❰ ANIME VIDEO ❱"; // ডিফল্ট মেসেজ
+
+        // ভিডিও পাঠানো
+        message.reply({
+          body: randomMessage, // JSON থেকে নেওয়া মেসেজ
+          attachment: await global.utils.getStreamFromURL(randomVideo),
+        });
+
+      } catch (error) {
+        console.error("Error fetching video links:", error);
+        return message.reply("Failed to load video. Please try again later.");
+      }
+    } else {
+      return message.reply("Invalid command. Please use 'rndm', 'random', or 'status' to get a video.");
     }
   }
 };
