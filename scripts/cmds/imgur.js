@@ -3,7 +3,7 @@ const axios = require('axios');
 module.exports = {
   config: {
     name: "imgur",
-    version: "1.2",
+    version: "1.3",
     author: "ArYAN (Modified by ChatGPT)",
     countDown: 5,
     role: 0,
@@ -23,12 +23,12 @@ module.exports = {
     try {
       const res = await axios.get(`https://imgur-upload-mahabub-x-imran.onrender.com/mahabub?link=${encodeURIComponent(linkanh)}`);
 
-      // Check if response contains a valid image URL
-      if (!res.data || !res.data.uploaded || !res.data.uploaded.image) {
-        return api.sendMessage('❌ Error: Invalid response from the Imgur upload API.', event.threadID, event.messageID);
+      // Ensure API response has "image" property
+      if (!res.data || !res.data.image) {
+        return api.sendMessage('❌ Error: Invalid response from the API.', event.threadID, event.messageID);
       }
 
-      const imgurLink = res.data.uploaded.image;
+      const imgurLink = res.data.image; // Only using "image" property
       return api.sendMessage(`✅ Image uploaded successfully:\n${imgurLink}`, event.threadID, event.messageID);
     } catch (error) {
       console.error("Upload Error:", error.response?.data || error.message);
