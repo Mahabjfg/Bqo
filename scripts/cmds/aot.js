@@ -2,8 +2,8 @@ const axios = require("axios");
 
 module.exports = {
   config: {
-    name: "anime",
-    aliases: ["ani", "rndm", "random", "status"], // Add the new aliases here
+    name: "rndm",
+    aliases: ["status", "rndm", "random", "status"], // Add the new aliases here
     version: "1.0",
     author: "‎MR᭄﹅ MAHABUB﹅ メꪜ",
     countDown: 10,
