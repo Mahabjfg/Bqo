@@ -34,7 +34,7 @@ module.exports = {
         return api.sendMessage(' দুঃখিত এই মুহূর্তে প্রসেসটি complete করতে ব্যর্থ...!😿 ', event.threadID, event.messageID);
       }
 
-      return api.sendMessage(`uploaded successfully:\n"${res.data.data.link}",`, event.threadID, event.messageID);
+      return api.sendMessage(`uploaded successfully:\n${res.data.data.link}`, event.threadID, event.messageID);
     } catch (error) {
       console.error("Upload Error:", error.response?.data || error.message);
 
