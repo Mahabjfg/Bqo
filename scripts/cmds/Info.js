@@ -29,7 +29,7 @@ module.exports = {
         const botName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕-𝗕𝗢𝗧";
         const botPrefix = "/";
         const authorName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕 𝗥𝗔𝗛𝗠𝗔𝗡";
-        const authorFB = "m.me/www.xnxx.com140";
+        const authorFB = "m.me/www.xnxx.com140";  // Replace with your actual FB Messenger link
         const authorInsta = "@mahabub_rahman_404";
         const status = "𝚂𝙸𝙽𝙶𝙻𝙴..!";
 
@@ -45,9 +45,17 @@ module.exports = {
         const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
         try {
-            const response = await axios.get("https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/refs/heads/main/Commands/Mahabub.json");
+            const response = await axios.get("https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/Commands/Mahabub.json");
             const urls = response.data;
+
+            if (!Array.isArray(urls) || urls.length === 0) {
+                throw new Error("Invalid or empty JSON data.");
+            }
+
             const link = urls[Math.floor(Math.random() * urls.length)];
+
+            // Using axios to stream the image
+            const imageResponse = await axios.get(link, { responseType: 'stream' });
 
             message.reply({
                 body: `╭────────────◊
@@ -57,16 +65,16 @@ module.exports = {
 ├‣ 𝐏𝐫𝐞𝐟𝐢𝐱: ${botPrefix}
 ├‣ 𝐅𝐛: ${authorFB}
 ├‣ 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦: ${authorInsta}
-├‣ 𝐑𝐞𝐥𝐚𝐭𝐢𝐨𝐧𝐬𝐡𝐢𝐩: ${status} 
+├‣ 𝐑𝐞𝐥𝐚𝐭𝐢𝐨𝐧𝐬𝐡𝐢𝐩: ${status}
 ├‣ 𝐃𝐚𝐭𝐞: ${date}
 ├‣ 𝐓𝐢𝐦𝐞: ${time}
 ├‣ 𝐔𝐩𝐭𝐢𝐦𝐞: ${uptimeString}
 ╰────────────◊`,
-                attachment: await global.utils.getStreamFromURL(link)
+                attachment: imageResponse.data
             });
         } catch (error) {
-            console.error("Error fetching JSON data:", error);
-            message.reply("❌ Error fetching bot info. Please try again later.");
+            console.error("Error fetching video data:", error);
+            message.reply("❌ Error fetching bot's author info. Please try again later.");
         }
     }
 };
