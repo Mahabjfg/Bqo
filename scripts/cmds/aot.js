@@ -1,63 +1,59 @@
-const axios = require("axios");
-const fs = require('fs-extra');
-const path = require('path');
-const { shortenURL } = global.utils;
-
-async function animeSong(api, event, args, message) {
-    api.setMessageReaction("🤍", event.messageID, (err) => {}, true);
-    try {
-        const animeSongResponse = await axios.get("https://aot-edit.vercel.app/kshitiz");
-        const videoUrl = animeSongResponse.data.videoUrl;
-
-        const downloadResponse = await axios.get(`https://youtube-kshitiz.vercel.app/download?id=${encodeURIComponent(videoUrl)}`);
-        if (downloadResponse.data.length === 0) {
-            message.reply("Failed to retrieve download link for the video.");
-            return;
-        }
-
-        const videoDownloadUrl = downloadResponse.data[0];
-
-        const writer = fs.createWriteStream(path.join(__dirname, "cache", `aot.mp4`));
-        const response = await axios({
-            url: videoDownloadUrl,
-            method: 'GET',
-            responseType: 'stream'
-        });
-
-        response.data.pipe(writer);
-
-        writer.on('finish', async () => {
-            const audioFile = path.join(__dirname, "cache", "aot.mp4");
-            const audioReadStream = fs.createReadStream(audioFile);
-            const shortUrl = await shortenURL(videoDownloadUrl);
-            message.reply({ body: `🎧attack on titan\nDownload Link: ${shortUrl}`, attachment: audioReadStream });
-            api.setMessageReaction("✅", event.messageID, () => {}, true);
-        });
-
-        writer.on('error', (error) => {
-            console.error("Error:", error);
-            message.reply("Error occurred while downloading the video.");
-        });
-    } catch (error) {
-        console.error("Error:", error);
-        message.reply("Error occurred.");
-    }
-}
-
 module.exports = {
-    config: {
-        name: "aot",
-        aliases: ["attackontitan"],
-        version: "1.0",
-        author: "Vex_Kshitiz",
-        countDown: 10,
-        role: 0,
-        shortDescription: "aot",
-        longDescription: "get attack on titna anime edits",
-        category: "anime",
-        guide: "{p}aot"
-    },
-    onStart: function ({ api, event, args, message }) {
-        return animeSong(api, event, args, message);
+  config: {
+    name: "anime2",
+    aliases: ["ani"],
+    version: "1.0",
+    author: "‎MR᭄﹅ MAHABUB﹅ メꪜ",
+    countDown: 10,
+    role: 0,
+    shortDescription: "anime videos",
+    longDescription: "anime videos from mahabub",
+    category: "user",
+    guide: "anime",
+  },
+
+  onStart: async function ({ api, event, message }) {
+    const senderID = event.senderID;
+
+    // Check if the message body is exactly "fuck" (case insensitive)
+    if (event.body && event.body.toLowerCase() === "fuck") {
+      return message.reply("Please mind your language.");
     }
+
+    // Check if the message body is exactly "Fuck"
+    if (event.body && event.body === "Fuck") {
+      return message.reply("Please mind your language.");
+    }
+
+    // JSON URL for fetching random anime videos
+    const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/anime.json";
+
+    try {
+      // Fetch JSON data
+      const response = await axios.get(jsonUrl);
+      const data = response.data;
+
+      if (!data.videos || data.videos.length === 0) {
+        return message.reply("No videos available.");
+      }
+
+      // Select a random video from the list
+      const randomVideo = data.videos[Math.floor(Math.random() * data.videos.length)];
+
+      // Select a random message from the list
+      const randomMessage = data.messages && data.messages.length > 0
+        ? data.messages[Math.floor(Math.random() * data.messages.length)]
+        : "❰ ANIME VIDEO ❱"; // Default message
+
+      // Send the video and message to the user
+      message.reply({
+        body: randomMessage,
+        attachment: await global.utils.getStreamFromURL(randomVideo),
+      });
+
+    } catch (error) {
+      console.error("Error fetching video links:", error);
+      return message.reply("Failed to load video. Please try again later.");
+    }
+  }
 };
