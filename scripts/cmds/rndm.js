@@ -24,7 +24,7 @@ module.exports = {
 
     const messageText = body.trim().toLowerCase();
 
-    if (["rndm", "random", "status"].includes(messageText)) {
+    if (["rndm", "mahabub", "random", "status"].includes(messageText)) {
       await sendAnimeVideo(api, event, message);
     }
   }
@@ -35,7 +35,7 @@ async function sendAnimeVideo(api, event, message) {
 
   message.reply("🔄 Fetching a random status video... Please wait!");
 
-  const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/anime.json";
+  const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/Commands/Rndm/rndm.json";
 
   try {
     const response = await axios.get(jsonUrl);
@@ -54,9 +54,8 @@ async function sendAnimeVideo(api, event, message) {
 
     const randomMessage = data.messages && data.messages.length > 0
       ? data.messages[Math.floor(Math.random() * data.messages.length)]
-      : "❰ ANIME VIDEO ❱";
+      : "status video. title unfind!";
 
-    // ✅ Send the video directly from URL (without downloading)
     message.reply({
       body: randomMessage,
       attachment: await global.utils.getStreamFromURL(randomVideo)
