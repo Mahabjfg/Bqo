@@ -2,8 +2,8 @@ const axios = require("axios");
 
 module.exports = {
   config: {
-    name: "anime",
-    aliases: ["ani", "rndm", "random", "status"], // Adding aliases to catch various commands
+    name: "anime2",
+    aliases: ["s", "rndm", "random", "status"], // Adding aliases to catch various commands
     version: "1.0",
     author: "‎MR᭄﹅ MAHABUB﹅ メꪜ",
     countDown: 10,
@@ -11,7 +11,7 @@ module.exports = {
     shortDescription: "anime videos",
     longDescription: "anime videos from mahabub",
     category: "user",
-    guide: "anime",  // No prefix needed now
+    guide: "anime2",  // No prefix needed now
   },
 
   onStart: async function ({ api, event, message }) {
