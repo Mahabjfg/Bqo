@@ -109,26 +109,48 @@ module.exports = {
 
         if (!data.results.length) {
           api.sendMessage("❌ No results found for your search", event.threadID);
+          return;
         }
 
         const results = data.results;
-        const message = results.map((track, index) =>
-          `${index + 1}. ${track.title}`
-        ).join("\n\n");
+        const firstResult = results[0];
 
-        api.sendMessage(
-          `🎧 Found ${results.length} tracks:\n\n${message}\n\nReply with the track number (1-${results.length}) to download`,
-          event.threadID,
-          (err, info) => {
-            global.GoatBot.onReply.set(info.messageID, {
-              type: "reply",
-              name: this.config.name,
-              messageID: info.messageID,
-              author: event.senderID,
-              results: results
-            });
-          }
+        // Automatically select the first result
+        api.sendMessage("⬇️ Downloading the first result...", event.threadID);
+
+        const { title, permalink_url } = firstResult;
+
+        const downloadData = await axios.get(
+          `https://nayan-video-downloader.vercel.app/soundcloud?url=${permalink_url}`
         );
+
+        const { download_url } = downloadData.data.data;
+        const filePath = `${__dirname}/cache/${title}.mp3`;
+
+        const writer = fs.createWriteStream(filePath);
+        const response = await axios.get(download_url, { responseType: "stream" });
+        response.data.pipe(writer);
+
+        writer.on("finish", () => {
+          console.log(`File downloaded and saved at: ${filePath}`);
+          const fileSize = fs.statSync(filePath).size;
+
+          if (fileSize > 26214400) {
+            unlinkSync(filePath);
+            return api.sendMessage("❌ File size exceeds 25MB limit!", event.threadID);
+          }
+
+          api.sendMessage({
+            body: `🎵 Successfully Downloaded:\n\nTitle: ${title}`,
+            attachment: createReadStream(filePath)
+          }, event.threadID, () => unlinkSync(filePath));
+        });
+
+        // Handle errors during file writing
+        writer.on("error", (error) => {
+          console.error("Error writing file:", error);
+          api.sendMessage("⚠️ Failed to download the track.", event.threadID);
+        });
       }
     } catch (error) {
       console.error("Error in onStart:", error);
