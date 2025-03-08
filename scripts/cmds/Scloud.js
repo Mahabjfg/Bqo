@@ -21,25 +21,23 @@ module.exports = {
       }
 
       const track = results[choice];
-      console.log("Track selected:", track); // Debugging: Track info
+      console.log("Track selected:", track.permalink_url); // Debugging: Track URL
       api.sendMessage("⬇️ Downloading track...", event.threadID);
 
-      // Fetch download link
-      const { data } = await axios.get(`https://nayan-video-downloader.vercel.app/soundcloud?url=${track.permalink_url}`);
-      
+      const apiUrl = `https://nayan-video-downloader.vercel.app/soundcloud?url=${encodeURIComponent(track.permalink_url)}`;
+      console.log("Fetching:", apiUrl); // Debugging: API URL
+
+      const { data } = await axios.get(apiUrl);
+      console.log("API Response:", data); // Debugging: API response
+
       if (!data || !data.data || !data.data.download_url) {
         return api.sendMessage("⚠️ Failed to fetch track download link.", event.threadID);
       }
 
       const { title, download_url } = data.data;
-      console.log("Download URL:", download_url); // Debugging: Check download URL
-
       const cacheDir = path.join(__dirname, "cache");
 
-      // Ensure cache directory exists
-      if (!fs.existsSync(cacheDir)) {
-        fs.mkdirSync(cacheDir, { recursive: true });
-      }
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
 
       const filePath = path.join(cacheDir, `${title}.mp3`);
       const writer = fs.createWriteStream(filePath);
@@ -47,17 +45,15 @@ module.exports = {
       const response = await axios.get(download_url, { responseType: "stream" });
       response.data.pipe(writer);
 
-      // Wait for download to complete
       await new Promise((resolve, reject) => {
         writer.on("finish", resolve);
         writer.on("error", reject);
       });
 
-      // Check file size before sending
       const fileSize = fs.statSync(filePath).size;
-      console.log("File size:", fileSize); // Debugging: Check file size
+      console.log("File size:", fileSize); // Debugging: File size
 
-      if (fileSize > 26214400) { // 25MB limit
+      if (fileSize > 26214400) {
         unlinkSync(filePath);
         return api.sendMessage("❌ File size exceeds the 25MB limit!", event.threadID);
       }
@@ -85,22 +81,20 @@ module.exports = {
       if (input.startsWith("https://soundcloud.com/")) {
         api.sendMessage("⏳ Processing direct link...", event.threadID);
 
-        // Fetch track details
-        const { data } = await axios.get(`https://nayan-video-downloader.vercel.app/soundcloud?url=${input}`);
+        const apiUrl = `https://nayan-video-downloader.vercel.app/soundcloud?url=${encodeURIComponent(input)}`;
+        console.log("Fetching:", apiUrl); // Debugging: API URL
+
+        const { data } = await axios.get(apiUrl);
+        console.log("API Response:", data); // Debugging: API response
 
         if (!data || !data.data || !data.data.download_url) {
           return api.sendMessage("⚠️ Failed to fetch track details.", event.threadID);
         }
 
         const { title, download_url } = data.data;
-        console.log("Download URL:", download_url); // Debugging: Check download URL
-
         const cacheDir = path.join(__dirname, "cache");
 
-        // Ensure cache directory exists
-        if (!fs.existsSync(cacheDir)) {
-          fs.mkdirSync(cacheDir, { recursive: true });
-        }
+        if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
 
         const filePath = path.join(cacheDir, `${title}.mp3`);
         const writer = fs.createWriteStream(filePath);
@@ -121,8 +115,12 @@ module.exports = {
       } else {
         api.sendMessage("🔍 Searching SoundCloud...", event.threadID);
 
-        const { data } = await axios.get(`https://nayan-video-downloader.vercel.app/soundcloud-search?name=${encodeURIComponent(input)}&limit=6`);
-        
+        const searchApiUrl = `https://nayan-video-downloader.vercel.app/soundcloud-search?name=${encodeURIComponent(input)}&limit=6`;
+        console.log("Fetching:", searchApiUrl); // Debugging: API URL
+
+        const { data } = await axios.get(searchApiUrl);
+        console.log("API Response:", data); // Debugging: API response
+
         if (!data || !data.results || data.results.length === 0) {
           return api.sendMessage("❌ No results found for your search.", event.threadID);
         }
