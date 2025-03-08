@@ -37,7 +37,7 @@ async function sendAnimeVideo(api, event, message) {
 
   message.reply("🔄 Fetching a random status video... Please wait!");
 
-  const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/anime.json";
+  const jsonUrl = "https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/main/Commands/Rndm/rndm.json";
 
   try {
     const response = await axios.get(jsonUrl);
