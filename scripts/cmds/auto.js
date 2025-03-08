@@ -20,8 +20,8 @@ let autoLinkStates = loadAutoLinkStates();
 module.exports = {
   config: {
     name: 'autolink',
-    version: '3.5',
-    author: 'MOHAMMAD NAYAN',
+    version: '1.0',
+    author: 'MAHABUB RAHMAN',
     countDown: 5,
     role: 0,
     shortDescription: 'Auto-download and send videos with title',
@@ -40,7 +40,6 @@ module.exports = {
 
     const url = linkMatch[0];
 
-    // স্টেট চেকিং করা হয়নি, তাই যেকোনো লিংকেই কাজ করবে
     api.setMessageReaction("⏳", event.messageID, () => {}, true);
 
     try {
@@ -53,7 +52,7 @@ module.exports = {
 
       const msg = `《 TITLE 》🎬 : *${title}*`;
 
-      const videoUrl = high || low; // If high link isn't available, use the low link
+      const videoUrl = high || low;
 
       request(videoUrl).pipe(fs.createWriteStream("video.mp4")).on("close", () => {
         api.sendMessage(
@@ -63,7 +62,7 @@ module.exports = {
           },
           event.threadID,
           () => {
-            fs.unlinkSync("video.mp4"); // Delete after sending
+            fs.unlinkSync("video.mp4"); 
           }
         );
       });
