@@ -1,5 +1,5 @@
 const fs = require('fs');
-const axios = require('axios');
+const path = require('path');
 
 module.exports = {
 	config: {
@@ -13,55 +13,37 @@ module.exports = {
 		category: "no prefix",
 	},
 	onStart: async function () { },
-
 	onChat: async function ({ event, message }) {
 		if (event.body) {
 			const word = event.body.toLowerCase();
-			let audioURL = null;
+			const folderPath = path.join(__dirname, "noprefix"); // Folder where MP3s are stored
 
-			// 🔹 Map trigger words to Google Drive Direct Links
-			switch (word) {
-				case "women":
-					audioURL = "https://docs.google.com/uc?export=download&id=1A2B3C4D5E6F7G8H9I0";
-					break;
-				case "yamate":
-					audioURL = "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE";
-					break;
-				case "dazai":
-					audioURL = "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE";
-					break;
-				case "ara":
-					audioURL = "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE";
-					break;
-				default:
-					return;
-			}
+			const audioResponses = {
+				"women": { text: "Women ☕", file: "banortor.mp3" },
+				"yamate": { text: "Yamate 🥵", file: "yamate.mp3" },
+				"dazai": { text: "ahhh~", file: "Dazai.mp3" },
+				"ara": { text: "ara ara", file: "ara.mp3" },
+				"good night": { text: "Good Night 🌉", file: "night.mp3" },
+				"sus": { text: "ඞ", file: "sus.mp3" },
+				"good morning": { text: "Good Morning 🌄", file: "gm.mp3" },
+				"yourmom": { text: "Bujis ki nai?", file: "yourmom.mp3" },
+				"machikney": { text: "Machikney", file: "machikney.mp3" },
+				"randi": { text: "Randi ko Chora", file: "randi.mp3" },
+				"sachiin": { text: "GAYY", file: "sachiin.mp3" },
+				"omg": { text: "OMG WoW 😳", file: "omg.mp3" }
+			};
 
-			if (audioURL) {
-				try {
-					// 🔹 Fetch the MP3 file from Google Drive
-					const response = await axios({
-						url: audioURL,
-						method: 'GET',
-						responseType: 'stream'
+			if (audioResponses[word]) {
+				const filePath = path.join(folderPath, audioResponses[word].file);
+
+				// Check if file exists before sending
+				if (fs.existsSync(filePath)) {
+					return message.reply({
+						body: `「 ${audioResponses[word].text} 」`,
+						attachment: fs.createReadStream(filePath),
 					});
-
-					const audioPath = `./temp_audio.mp3`;
-					const writer = fs.createWriteStream(audioPath);
-					response.data.pipe(writer);
-
-					writer.on('finish', async () => {
-						await message.reply({
-							body: `「 ${word.charAt(0).toUpperCase() + word.slice(1)} 」`,
-							attachment: fs.createReadStream(audioPath),
-						});
-
-						// 🔹 Delete temp file after sending
-						fs.unlinkSync(audioPath);
-					});
-				} catch (error) {
-					console.error("❌ Error downloading file:", error);
-					message.reply("Failed to fetch the audio file.");
+				} else {
+					return message.reply(`Error: File "${audioResponses[word].file}" not found!`);
 				}
 			}
 		}
