@@ -19,8 +19,9 @@ module.exports = {
 			const word = event.body.toLowerCase();
 			let audioURL = null;
 
+			// 🔹 Map trigger words to Google Drive Direct Links
 			switch (word) {
-				case "i love you":
+				case "women":
 					audioURL = "https://docs.google.com/uc?export=download&id=1A2B3C4D5E6F7G8H9I0";
 					break;
 				case "yamate":
@@ -36,9 +37,9 @@ module.exports = {
 					return;
 			}
 
-			// Download the file and send it
 			if (audioURL) {
 				try {
+					// 🔹 Fetch the MP3 file from Google Drive
 					const response = await axios({
 						url: audioURL,
 						method: 'GET',
@@ -49,14 +50,17 @@ module.exports = {
 					const writer = fs.createWriteStream(audioPath);
 					response.data.pipe(writer);
 
-					writer.on('finish', () => {
-						message.reply({
+					writer.on('finish', async () => {
+						await message.reply({
 							body: `「 ${word.charAt(0).toUpperCase() + word.slice(1)} 」`,
 							attachment: fs.createReadStream(audioPath),
 						});
+
+						// 🔹 Delete temp file after sending
+						fs.unlinkSync(audioPath);
 					});
 				} catch (error) {
-					console.error("Error downloading file:", error);
+					console.error("❌ Error downloading file:", error);
 					message.reply("Failed to fetch the audio file.");
 				}
 			}
