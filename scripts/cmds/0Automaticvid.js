@@ -1,3 +1,6 @@
+const fs = require('fs');
+const axios = require('axios');
+
 module.exports = {
 	config: {
 		name: "audio",
@@ -9,33 +12,53 @@ module.exports = {
 		longDescription: "no prefix",
 		category: "no prefix",
 	},
-	onStart: async function(){},
-	onChat: async function({ event, message }) {
+	onStart: async function () { },
+
+	onChat: async function ({ event, message }) {
 		if (event.body) {
 			const word = event.body.toLowerCase();
+			let audioURL = null;
+
 			switch (word) {
 				case "i love you":
-					return message.reply({
-						body: "「 i love you too 😘」",
-						attachment: [ "https://docs.google.com/uc?export=download&id=1ckhnXkIkn8j4lqav2IlSTcqjFe040NLF" ],
-					});
+					audioURL = "https://docs.google.com/uc?export=download&id=1A2B3C4D5E6F7G8H9I0";
+					break;
 				case "yamate":
-					return message.reply({
-						body: "「 Yamate 🥵 」",
-						attachment: [ "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE" ],
-					});
+					audioURL = "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE";
+					break;
 				case "dazai":
-					return message.reply({
-						body: "「 ahhh~ 」",
-						attachment: [ "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE" ],
-					});
+					audioURL = "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE";
+					break;
 				case "ara":
-					return message.reply({
-						body: "「 ara ara 」",
-						attachment: [ "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE" ],
-					});
+					audioURL = "https://docs.google.com/uc?export=download&id=YOUR_FILE_ID_HERE";
+					break;
 				default:
-					return; 
+					return;
+			}
+
+			// Download the file and send it
+			if (audioURL) {
+				try {
+					const response = await axios({
+						url: audioURL,
+						method: 'GET',
+						responseType: 'stream'
+					});
+
+					const audioPath = `./temp_audio.mp3`;
+					const writer = fs.createWriteStream(audioPath);
+					response.data.pipe(writer);
+
+					writer.on('finish', () => {
+						message.reply({
+							body: `「 ${word.charAt(0).toUpperCase() + word.slice(1)} 」`,
+							attachment: fs.createReadStream(audioPath),
+						});
+					});
+				} catch (error) {
+					console.error("Error downloading file:", error);
+					message.reply("Failed to fetch the audio file.");
+				}
 			}
 		}
 	}
