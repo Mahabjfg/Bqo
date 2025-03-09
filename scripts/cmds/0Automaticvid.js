@@ -19,7 +19,7 @@ module.exports = {
 			const folderPath = path.join(__dirname, "noprefix"); // Folder where MP3s are stored
 
 			const audioResponses = {
-				"women": { text: "Women ☕", file: "banortor.mp3" },
+				"🙈","🙉","🙊","🐵": { text: "কিরে বানর তোর কি হলো🐒", file: "banortor.mp3" },
 				"yamate": { text: "Yamate 🥵", file: "yamate.mp3" },
 				"dazai": { text: "ahhh~", file: "Dazai.mp3" },
 				"ara": { text: "ara ara", file: "ara.mp3" },
