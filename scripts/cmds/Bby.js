@@ -4,7 +4,7 @@ module.exports.config = {
   name: "bby",
   aliases: ["baby", "bbe", "babe"],
   version: "6.9.0",
-  author: "dipto",
+  author: "mahabub",
   countDown: 0,
   role: 0,
   description: "better than all sim simi",
@@ -55,7 +55,7 @@ module.exports.onChat = async ({ api, event }) => {
       const userMessage = body.replace(/^\S+\s*/, "");
       if (!userMessage) return api.sendMessage("কথা দাও তুমি আমাকে পটিয়ে নিবা!🥺", event.threadID, event.messageID);
 
-      const apiUrl = `https://simsimi-99qa.onrender.com/sim`; // SimSimi API URL
+      const apiUrl = `https://mahabub-simsimi-api.onrender.com/mahabub_x_imran`; // SimSimi API URL
       const response = await axios.get(`${apiUrl}?reply=${encodeURIComponent(userMessage)}`);
       const reply = response.data.message || "I couldn't understand that.";
 
